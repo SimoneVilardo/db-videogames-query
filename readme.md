@@ -240,17 +240,49 @@ WHERE award_videogame.year = 2018 AND tournaments.year = '2019' AND awards.name 
 
 10- Selezionare i dati della prima software house che ha rilasciato un gioco, assieme ai dati del gioco stesso (software house id : 5)
 ```sql 
-
+SELECT software_houses.*, videogames.*
+FROM software_houses
+	JOIN videogames 
+    	ON software_houses.id = videogames.software_house_id
+ORDER BY videogames.release_date
+LIMIT 1;
 ```
 11- Selezionare i dati del videogame (id, name, release_date, totale recensioni) con piÃ¹ recensioni (videogame id : potrebbe uscire 449 o 398, sono entrambi a 20)
 ```sql 
-
+SELECT videogames.id, videogames.name, videogames.release_date, COUNT(reviews.id) AS total_reviews
+FROM 
+    videogames
+	JOIN reviews 
+    	ON videogames.id = reviews.videogame_id
+GROUP BY videogames.id
+ORDER BY total_reviews DESC
+LIMIT 1;
 ```
 12- Selezionare la software house che ha vinto piÃ¹ premi tra il 2015 e il 2016 (software house id : potrebbe uscire 3 o 1, sono entrambi a 3)
 ```sql 
-
+SELECT software_houses.id, software_houses.name, COUNT(awards.id) AS total_awards
+FROM software_houses
+	JOIN videogames 
+    	ON software_houses.id = videogames.software_house_id
+	JOIN award_videogame 
+    	ON videogames.id = award_videogame.videogame_id
+	JOIN awards 
+    	ON award_videogame.award_id = awards.id
+WHERE award_videogame.year BETWEEN 2015 AND 2016
+GROUP BY software_houses.id
+ORDER BY total_awards DESC
+LIMIT 1;
 ```
 13- Selezionare le categorie dei videogame i quali hanno una media recensioni inferiore a 2 (10)
 ```sql 
-
+SELECT DISTINCT categories.id, categories.name
+FROM categories
+	JOIN category_videogame 
+    	ON categories.id = category_videogame.category_id
+	JOIN videogames 
+    	ON videogames.id = category_videogame.videogame_id
+	JOIN reviews 
+    	ON videogames.id = reviews.videogame_id
+GROUP BY categories.id, categories.name, videogames.id
+HAVING AVG(reviews.rating) < 2;
 ```
